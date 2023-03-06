@@ -113,7 +113,7 @@ class Game {
         scoreEl.textContent = score;
     }
 
-    async ButtonDance(laps = 1) {
+    async buttonDance(laps = 1) {
         for (let step = 0; step < laps; step++) {
             for (const btn of this.buttons.values()) {
                 await btn.press(0.0);
