@@ -133,17 +133,17 @@ class Game {
         if (scoresText) {
             scores = JSON.parse(scoresText);
         }
-        scores = this.updateScores(username, score, scores);
+        scores = this.updateScores(userName, score, scores);
 
-        localStorage.set('scores', JSON.stringify(scores));
+        localStorage.setItem('scores', JSON.stringify(scores));
     }
 
     updateScores(userName, score, scores) {
         const date = new Date().toLocaleDateString();
-        const newScore = { name: userName, score: score, date: date};
+        const newScore = { name: userName, score: score, date: date };
 
         let found = false;
-        for (const [i, prevScore] of scores.entries) {
+        for (const [i, prevScore] of scores.entries()) {
             if (score > prevScore.score) {
                 scores.splice(i, 0, newScore);
                 found = true;
@@ -163,7 +163,7 @@ class Game {
     }
 }
 
-const game = new game();
+const game = new Game();
 
 function delay(milliseconds) {
     return new Promise((resolve) => {
