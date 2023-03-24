@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const DB = require('./database.js');
 
 const port = process.argv.length > 2 ? process.argv[2] : 3000;
 
@@ -10,12 +11,14 @@ app.use(express.static('public'));
 var apiRouter = express.Router();
 app.use(`/api`, apiRouter);
 
-apiRouter.get('/scores', (_req, res) => {
+apiRouter.get('/scores', async (_req, res) => {
+    const scores = await DB.getHighScores();
     res.send(scores);
 });
 
-apiRouter.post('/score', (req, res) => {
-    scores = updateScores(req.body, scores);
+apiRouter.post('/score', async (req, res) => {
+    DB.addScore(req.body);
+    const scores = await DB.getHighScores();
     res.send(scores);
 });
 
@@ -26,25 +29,3 @@ app.use((_req, res) => {
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });
-
-let scores = [];
-function updateScores(newScore, scores) {
-    let found = false;
-    for (const [i, prevScore] of scores.entries()) {
-        if (newScore.score > prevScore.score) {
-            scores.splice(i, 0, newScore);
-            found = true;
-            break;
-        }
-    }
-    
-    if (!found) {
-        scores.push(newScore);
-    }
-
-    if (scores.length > 10) {
-        scores.length = 10;
-    }
-
-    return scores;
-}
