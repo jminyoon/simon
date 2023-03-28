@@ -24,6 +24,19 @@ if (!userName) {
     return userCollection.findOne({ token: token });
   }
 
+  async function createUser(email, password) {
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const user = {
+      email: email, 
+      password: passwordHash,
+      token: uuid.v4(),
+    };
+    await userCollection.insertOne(user);
+
+    return user;
+  }
+
   function addScore(score) {
     scoreCollection.insertOne(score);
   }
@@ -38,4 +51,10 @@ if (!userName) {
     return cursor.toArray();
   }
   
-  module.exports = {addScore, getHighScores};
+  module.exports = {
+    getUser,
+    getUserByToken,
+    createUser,
+    addScore, 
+    getHighScores
+  };
