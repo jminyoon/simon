@@ -1,14 +1,12 @@
 async function loadScores() {
     let scores = [];
     try {
-      
       const response = await fetch('/api/scores');
       scores = await response.json();
-  
       
       localStorage.setItem('scores', JSON.stringify(scores));
-    } catch {
-      
+    } 
+    catch {
       const scoresText = localStorage.getItem('scores');
       if (scoresText) {
         scores = JSON.parse(scoresText);
@@ -22,7 +20,6 @@ async function loadScores() {
     const tableBodyEl = document.querySelector('#scores');
   
     if (scores.length) {
-      
       for (const [i, score] of scores.entries()) {
         const positionTdEl = document.createElement('td');
         const nameTdEl = document.createElement('td');
@@ -42,7 +39,8 @@ async function loadScores() {
   
         tableBodyEl.appendChild(rowEl);
       }
-    } else {
+    } 
+    else {
       tableBodyEl.innerHTML = '<tr><td colSpan=4>Be the first to score</td></tr>';
     }
   }
