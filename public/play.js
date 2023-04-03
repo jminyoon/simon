@@ -1,5 +1,3 @@
-const { json } = require("express");
-
 const GameEndEvent = 'gameEnd';
 const GameStartEvent = 'gameStart';
 
