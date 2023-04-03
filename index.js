@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const express = require('express');
 const app = express();
 const DB = require('./database.js');
+const { peerProxy } = require('./peerProxy.js');
 
 const authCookieName = 'token';
 
@@ -14,7 +15,7 @@ app.use(cookieParser());
 
 app.use(express.static('public'));
 
-var apiRouter = express.Router();
+const apiRouter = express.Router();
 app.use(`/api`, apiRouter);
 
 apiRouter.post('/auth/create', async (req, res) => {
@@ -28,9 +29,9 @@ apiRouter.post('/auth/create', async (req, res) => {
 
         res.send({
             id: user._id,
-        })
+        });
     }
-})
+});
 
 apiRouter.post('/auth/login', async (req, res) => {
     const user = await DB.getUser(req.body.email);
@@ -59,26 +60,27 @@ apiRouter.get('/user/:email', async (req, res) => {
     res.status(404).send({ msg: 'Unknown' });
 });
 
-var secureApiRouter = express.Router();
+const secureApiRouter = express.Router();
 apiRouter.use(secureApiRouter);
 
 secureApiRouter.use(async (req, res, next) => {
-  authToken = req.cookies[authCookieName];
+  const authToken = req.cookies[authCookieName];
   const user = await DB.getUserByToken(authToken);
   if (user) {
     next();
-  } else {
+  } 
+  else {
     res.status(401).send({ msg: 'Unauthorized' });
   }
 });
 
-apiRouter.get('/scores', async (_req, res) => {
+apiRouter.get('/scores', async (req, res) => {
     const scores = await DB.getHighScores();
     res.send(scores);
 });
 
 apiRouter.post('/score', async (req, res) => {
-    DB.addScore(req.body);
+    await DB.addScore(req.body);
     const scores = await DB.getHighScores();
     res.send(scores);
 });
@@ -99,6 +101,8 @@ function setAuthCookie(res, authToken) {
     });
 }
 
-app.listen(port, () => {
+const httpService = app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });
+
+peerProxy(httpService);
