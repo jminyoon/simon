@@ -1,3 +1,5 @@
+import React from 'react';
+
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
@@ -5,8 +7,30 @@ import { Login } from './login/login';
 import { Play } from './play/play';
 import { Scores } from './scores/scores';
 import { About } from './about/about';
+import { AuthState } from './login/authState';
 
 function App() {
+  const [userName, setUserName] = React.useState(localStorage.getItem('userName') || '');
+  const [authState, setAuthState] = React.useState(AuthState.Unknown);
+
+  React.useEffect(() => {
+    if (userName) {
+      fetch(`/api/user/${userName}`)
+        .then((response) => {
+          if (response.status === 200) {
+            return response.json();
+          }
+        })
+        .then((user) => {
+          const state = user?.authenticated ? AuthState.Authenticated : AuthState.Unauthenticated;
+          setAuthState(state);
+        });
+    } else {
+      setAuthState(AuthState.Unauthenticated);
+    }
+  }, [userName]);
+
+
   return (
     <BrowserRouter>
     <div class="top bg-dark text-light">
@@ -21,16 +45,20 @@ function App() {
                           Home
                         </NavLink>
                     </li>
-                    <li class="nav-item">
-                        <NavLink class="nav-link" to="play">
+                    {authState === AuthState.Authenticated && (
+                      <li className='nav-item'>
+                        <NavLink className='nav-link' to='play'>
                           Play
                         </NavLink>
-                    </li>
-                    <li class="nav-item">
-                        <NavLink class="nav-link" to="scores">
+                      </li>
+                    )}
+                    {authState === AuthState.Authenticated && (
+                      <li className='nav-item'>
+                        <NavLink className='nav-link' to='scores'>
                           Scores
                         </NavLink>
-                    </li>
+                      </li>
+                    )}
                     <li class="nav-item">
                         <NavLink class="nav-link" to="about">
                           About
