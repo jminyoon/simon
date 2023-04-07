@@ -1,5 +1,4 @@
 import React from 'react';
-
 import './scores.css'
 
 export function Scores() {
@@ -55,5 +54,5 @@ export function Scores() {
         <tbody id="scores">{scoreRows}</tbody>
       </table>
     </main>
-  )
+  );
 }
